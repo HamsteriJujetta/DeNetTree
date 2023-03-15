@@ -8,10 +8,10 @@ class Node(
     val id: String = "",
 
     @SerializedName("parent")
-    val parent: Node? = null,
+    var parent: Node? = null,
 
     @SerializedName("name")
-    val name: String = "",
+    var name: String = "",
 
     @SerializedName("children")
     val children: MutableList<Node> = mutableListOf()

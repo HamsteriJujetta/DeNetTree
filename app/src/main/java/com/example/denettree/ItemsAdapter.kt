@@ -4,11 +4,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class ItemsAdapter(
-    private val onItemClick: (Int) -> Unit
+    private val onItemClick: (Int) -> Unit,
+    private val onItemDelete: (Int) -> Unit
 ) : RecyclerView.Adapter<ItemsAdapter.ViewHolder>() {
 
     private var currentItems: List<Node> = emptyList()
@@ -19,9 +21,11 @@ class ItemsAdapter(
      */
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvNodeName: TextView
+        val ivDeleteNode: ImageView
 
         init {
             tvNodeName = view.findViewById(R.id.tvNodeName)
+            ivDeleteNode = view.findViewById(R.id.ivDeleteNode)
         }
     }
 
@@ -38,6 +42,10 @@ class ItemsAdapter(
 
         viewHolder.itemView.setOnClickListener {
             onItemClick(position)
+        }
+
+        viewHolder.ivDeleteNode.setOnClickListener {
+            onItemDelete(position)
         }
     }
 
