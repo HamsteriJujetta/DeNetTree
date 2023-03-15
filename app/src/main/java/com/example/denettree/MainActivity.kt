@@ -1,21 +1,21 @@
 package com.example.denettree
 
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
-import java.util.UUID
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private var currentJSON: String? = null
-    private var structure: Node? = null
-    private var currentNode: Node? = null
+    private var currentJSON: String = ""
+    private var structure: Node = Node()
+    private var currentNode: Node = structure
 
     private val tvParentNodeName: TextView by lazy { findViewById(R.id.tvParentNodeName) }
     private val rvItemList: RecyclerView by lazy { findViewById(R.id.rvItemList) }
@@ -27,30 +27,29 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setUpData()
+        currentJSON = "{\"id\":\"a32c5082-9937-44f9-b2ff-ddcc2ddfc791\",\"name\":\"a32c5082-9937-44f9-b2ff-ddcc2ddfc791\",\"children\":[{\"id\":\"123\",\"name\":\"123 name\",\"children\":[]},{\"id\":\"456\",\"name\":\"465 name\",\"children\":[]},{\"id\":\"789\",\"name\":\"789 name\",\"children\":[]}]}"
+        parseJSON()
+        updateAdapter()
+        convertToJSON()
+        //setUpData()
     }
 
     override fun onPause() {
         super.onPause()
-
         convertToJSON()
         saveJSON()
     }
 
     override fun onResume() {
         super.onResume()
-
-        loadJSON()
-        parseJSON()
+        //setUpData()
     }
 
 
     private fun setUpData() {
         loadJSON()
         parseJSON()
-        adapter.setCurrentItems(currentNode?.children ?: emptyList())
-        rvItemList.adapter = adapter
-        tvParentNodeName.text = currentNode?.name ?: "no..."
+        updateAdapter()
     }
 
     private fun saveJSON() {
@@ -61,32 +60,67 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadJSON() {
         val sharedPrefs = applicationContext.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
-        currentJSON = sharedPrefs.getString("json", "")
+        currentJSON = sharedPrefs.getString("json", "") ?: ""
+        Log.d("Hamster", "loadJSON, currentJSON = $currentJSON")
     }
 
     private fun parseJSON() {
         val gson = Gson()
         try {
-            structure = gson.fromJson(currentJSON, Node::class.java)
+            /*if (gson.fromJson(currentJSON, Node::class.java) == null) {
+                setDefaultStructure()
+            }*/
+            val list = gson.fromJson(currentJSON, Array<Node>::class.java)
+            Log.d("Hamster", "parsed = ${list.size}")
+            for (l in list) {
+                Log.d("Hamster", "\tparsing ${l.name}")
+            }
         } catch (e: JsonSyntaxException) {
-            Toast.makeText(applicationContext, "Failed to parse Json", Toast.LENGTH_LONG).show()
-            val str = UUID.randomUUID().toString()
-            currentNode = Node(
-                id = str,
-                parent = null,
-                name = str,
-                children = mutableListOf()
-            )
+            //Toast.makeText(applicationContext, "Failed to parse Json", Toast.LENGTH_LONG).show()
+            Log.d("Hamster", "parseJSON failed ${e.message}")
+            setDefaultStructure()
         }
+        Log.d("Hamster", "parseJSON, currentNode = ${currentNode.name}")
     }
 
     private fun convertToJSON() {
-        val gson = Gson()
-        currentJSON = gson.toJson(structure, Node::class.java)
+        val nodeAdapter = NodeSerializer()
+        val gsonBuilder = GsonBuilder().registerTypeAdapter(Node::class.java, nodeAdapter)
+        val gson = gsonBuilder.create()
+        currentJSON = gson.toJson(structure)
+        Log.d("Hamster", "convertToJSON, currentJSON = $currentJSON")
     }
 
     private fun processItemClick(position: Int) {
         Log.d("Hamster", "clicked $position")
+        currentNode = structure.children[position]
+        updateAdapter()
+    }
+
+    private fun updateAdapter() {
+        adapter.setCurrentItems(currentNode.children)
+        Log.d("Hamster", "updateAdapter, children = ${currentNode.children.map { it.name }}")
+        rvItemList.adapter = adapter
+        tvParentNodeName.text = "Current node:\n${currentNode.name}"
+    }
+
+    private fun setDefaultStructure() {
+        val str = UUID.randomUUID().toString()
+        //Log.d("Hamster", "setDefaultStructure, str = $str")
+        structure = Node(
+            id = str,
+            parent = null,
+            name = str,
+            children = mutableListOf()
+        )
+        currentNode = structure
+        currentNode.children.addAll(
+            mutableListOf(
+                Node("default", currentNode, "default name"),
+                Node("456", currentNode, "465 name"),
+                Node("789", currentNode, "789 name")
+            )
+        )
     }
 
 }

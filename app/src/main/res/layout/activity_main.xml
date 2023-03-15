@@ -8,7 +8,7 @@
 
     <TextView
         android:id="@+id/tvParentNodeName"
-        android:text="Hello"
+        android:text="@string/default_string"
         android:background="@color/purple_200"
         android:textColor="@color/black"
         android:textSize="20sp"
@@ -23,9 +23,10 @@
         android:id="@+id/rvItemList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvParentNodeName"
-        android:layout_margin="8dp" />
+        android:layout_margin="4dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

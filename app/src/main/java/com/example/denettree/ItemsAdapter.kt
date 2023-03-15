@@ -1,5 +1,6 @@
 package com.example.denettree
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,10 +18,10 @@ class ItemsAdapter(
      * (custom ViewHolder)
      */
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvName: TextView
+        val tvNodeName: TextView
 
         init {
-            tvName = view.findViewById(R.id.tvNodeName)
+            tvNodeName = view.findViewById(R.id.tvNodeName)
         }
     }
 
@@ -32,7 +33,8 @@ class ItemsAdapter(
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        viewHolder.tvName.text = currentItems[position].name
+        viewHolder.tvNodeName.text = currentItems[position].name
+        //Log.d("Hamster", "onBindViewHolder name = ${currentItems[position].name}")
 
         viewHolder.itemView.setOnClickListener {
             onItemClick(position)
@@ -43,6 +45,7 @@ class ItemsAdapter(
 
     fun setCurrentItems(items: List<Node>) {
         currentItems = items
+        notifyDataSetChanged()
     }
 
 }
