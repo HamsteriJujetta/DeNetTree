@@ -8,59 +8,69 @@
 
     <ImageView
         android:id="@+id/ivGoToParentNode"
-        android:clickable="true"
-        android:src="@drawable/back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:tint="@color/purple_500"
+        android:clickable="true"
+        android:src="@drawable/back"
+        app:layout_constraintBottom_toTopOf="@id/tvParentNodeName"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/tvParentNodeName"
-        />
+        app:tint="@color/purple_500" />
 
     <Button
         android:id="@+id/btnDeleteTree"
-        android:text="@string/delete_caption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginHorizontal="8dp"
         android:backgroundTint="@color/yellow"
-        android:textColor="@color/black"/>
-
-    <TextView
-        android:id="@+id/tvParentNodeName"
-        android:text="@string/default_string"
-        android:background="@color/purple_200"
+        android:text="@string/delete_caption"
         android:textColor="@color/black"
-        android:textSize="20sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivGoToParentNode"
-        android:layout_marginHorizontal="8dp"
-        android:layout_marginTop="20dp"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btnAddChild"
-        android:text="@string/add_node_caption"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvParentNodeName"/>
+        app:layout_constraintTop_toBottomOf="@id/ivGoToParentNode">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvItemList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnAddChild"
-        android:layout_marginHorizontal="8dp"/>
+        <TextView
+            android:id="@+id/tvParentNodeName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/purple_200"
+            android:text="@string/default_string"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivGoToParentNode" />
+
+        <Button
+            android:id="@+id/btnAddChild"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:text="@string/add_node_caption"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvParentNodeName" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:paddingBottom="70dp"
+            android:id="@+id/rvItemList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnAddChild" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

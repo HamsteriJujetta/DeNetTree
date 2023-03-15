@@ -72,23 +72,23 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun setUpData() {
-        Log.d("Hamster", "setUpData")
+        //Log.d("Hamster", "setUpData")
         parseJSON()
         updateAdapter()
     }
 
     private fun saveJSON() {
-        Log.d("Hamster", "saveJSON")
+        //Log.d("Hamster", "saveJSON")
         val sharedPrefs = applicationContext.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
         val editor = sharedPrefs.edit()
         editor.putString("json", currentJSON).apply()
     }
 
     private fun loadJSON() {
-        Log.d("Hamster", "loadJSON")
+        //Log.d("Hamster", "loadJSON")
         val sharedPrefs = applicationContext.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
         currentJSON = sharedPrefs.getString("json", "") ?: ""
-        Log.d("Hamster", "loadJSON, currentJSON = $currentJSON")
+        //Log.d("Hamster", "loadJSON, currentJSON = $currentJSON")
     }
 
     private fun parseJSON() {
@@ -105,10 +105,10 @@ class MainActivity : AppCompatActivity() {
             }
         } catch (e: JsonSyntaxException) {
             //Toast.makeText(applicationContext, "Failed to parse Json", Toast.LENGTH_LONG).show()
-            Log.d("Hamster", "parseJSON failed ${e.message}")
+            //Log.d("Hamster", "parseJSON failed ${e.message}")
             setDefaultStructure()
         }
-        Log.d("Hamster", "parseJSON, currentNode = ${currentNode.name}")
+        //Log.d("Hamster", "parseJSON, currentNode = ${currentNode.name}")
     }
 
     private fun setParentNodes(parentNode: Node) {
@@ -123,13 +123,13 @@ class MainActivity : AppCompatActivity() {
         val gsonBuilder = GsonBuilder().registerTypeAdapter(Node::class.java, nodeAdapter)
         val gson = gsonBuilder.create()
         currentJSON = "[${gson.toJson(structure)}]"
-        Log.d("Hamster", "convertToJSON, currentJSON = $currentJSON")
+        //Log.d("Hamster", "convertToJSON, currentJSON = $currentJSON")
         saveJSON()
     }
 
     private fun updateAdapter() {
         adapter.setCurrentItems(currentNode.children)
-        Log.d("Hamster", "updateAdapter, children = ${currentNode.children.map { it.name }}")
+        //Log.d("Hamster", "updateAdapter, children = ${currentNode.children.map { it.name }}")
         rvItemList.adapter = adapter
         if (currentNode.parent == null) {
             tvParentNodeName.text = "Root:\n${currentNode.name}"
@@ -139,43 +139,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setDefaultStructure() {
-        val str = UUID.randomUUID().toString()
-        Log.d("Hamster", "setDefaultStructure, str = $str")
-        structure = Node(
-            id = str,
-            parent = null,
-            name = "",
-            children = mutableListOf()
-        ).apply {
-            name = this.hashCode().toString()
-        }
+        //Log.d("Hamster", "setDefaultStructure")
+        structure = Node()
         currentNode = structure
-        /*currentNode.children.addAll(
-            mutableListOf(
-                Node("default", currentNode, "default name"),
-                Node("456", currentNode, "465 name"),
-                Node("789", currentNode, "789 name")
-            )
-        )*/
     }
 
     private fun processItemClick(position: Int) {
-        Log.d("Hamster", "clicked $position")
+        //Log.d("Hamster", "clicked $position")
         currentNode = currentNode.children[position]
         updateAdapter()
     }
 
     private fun processAddItem() {
-        val str = UUID.randomUUID().toString()
         currentNode.children.add(
-            Node(
-                id = str,
-                parent = currentNode,
-                name = "",
-                children = mutableListOf()
-            ).apply {
-                name = this.hashCode().toString()
-            }
+            Node(parent = currentNode)
         )
         updateAdapter()
         convertToJSON()
@@ -189,7 +166,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun processGoToParentNode() {
         val parent = currentNode.parent
-        Log.d("Hamster", "processGoToParentNode ${parent?.name}")
+        //Log.d("Hamster", "processGoToParentNode ${parent?.name}")
         if (parent != null) {
             currentNode = parent
         }
