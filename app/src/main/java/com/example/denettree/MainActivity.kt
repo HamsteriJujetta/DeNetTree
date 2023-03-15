@@ -2,10 +2,10 @@ package com.example.denettree
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
@@ -18,12 +18,12 @@ class MainActivity : AppCompatActivity() {
     private var currentJSON: String = ""
     private var structure: Node = Node()
     private var currentNode: Node = structure
+    private var operationsCount = 0 // TODO !!!
 
     private val tvParentNodeName: TextView by lazy { findViewById(R.id.tvParentNodeName) }
     private val ivGoToParentNode: ImageView by lazy { findViewById(R.id.ivGoToParentNode) }
 
     private val btnAddChild: Button by lazy { findViewById(R.id.btnAddChild) }
-    //private val btnSaveTree: Button by lazy { findViewById(R.id.btnSaveTree) }
     private val btnDeleteTree: Button by lazy { findViewById(R.id.btnDeleteTree) }
 
     private val rvItemList: RecyclerView by lazy { findViewById(R.id.rvItemList) }
@@ -41,9 +41,6 @@ class MainActivity : AppCompatActivity() {
         btnAddChild.setOnClickListener {
             processAddItem()
         }
-        /*btnSaveTree.setOnClickListener {
-            convertToJSON()
-        }*/
         btnDeleteTree.setOnClickListener {
             applicationContext.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
                 .edit()
@@ -60,35 +57,21 @@ class MainActivity : AppCompatActivity() {
         setUpData()
     }
 
-    override fun onPause() {
-        super.onPause()
-        convertToJSON()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        //setUpData()
-    }
-
 
     private fun setUpData() {
-        //Log.d("Hamster", "setUpData")
         parseJSON()
         updateAdapter()
     }
 
     private fun saveJSON() {
-        //Log.d("Hamster", "saveJSON")
         val sharedPrefs = applicationContext.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
         val editor = sharedPrefs.edit()
         editor.putString("json", currentJSON).apply()
     }
 
     private fun loadJSON() {
-        //Log.d("Hamster", "loadJSON")
         val sharedPrefs = applicationContext.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
         currentJSON = sharedPrefs.getString("json", "") ?: ""
-        //Log.d("Hamster", "loadJSON, currentJSON = $currentJSON")
     }
 
     private fun parseJSON() {
@@ -98,17 +81,22 @@ class MainActivity : AppCompatActivity() {
             val list = gson.fromJson(currentJSON, Array<Node>::class.java)
             if (list?.size == 1) {
                 structure = list[0]
-                currentNode = structure
                 setParentNodes(currentNode)
             } else {
-                setDefaultStructure()
+                structure = Node()
             }
         } catch (e: JsonSyntaxException) {
-            //Toast.makeText(applicationContext, "Failed to parse Json", Toast.LENGTH_LONG).show()
-            //Log.d("Hamster", "parseJSON failed ${e.message}")
-            setDefaultStructure()
+            Toast.makeText(applicationContext, "Failed to parse Json", Toast.LENGTH_LONG).show()
+            structure = Node()
         }
-        //Log.d("Hamster", "parseJSON, currentNode = ${currentNode.name}")
+    }
+
+    private fun convertToJSON() {
+        val nodeAdapter = NodeSerializer()
+        val gsonBuilder = GsonBuilder().registerTypeAdapter(Node::class.java, nodeAdapter)
+        val gson = gsonBuilder.create()
+        currentJSON = "[${gson.toJson(structure)}]"
+        saveJSON()
     }
 
     private fun setParentNodes(parentNode: Node) {
@@ -118,18 +106,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun convertToJSON() {
-        val nodeAdapter = NodeSerializer()
-        val gsonBuilder = GsonBuilder().registerTypeAdapter(Node::class.java, nodeAdapter)
-        val gson = gsonBuilder.create()
-        currentJSON = "[${gson.toJson(structure)}]"
-        //Log.d("Hamster", "convertToJSON, currentJSON = $currentJSON")
-        saveJSON()
-    }
-
     private fun updateAdapter() {
         adapter.setCurrentItems(currentNode.children)
-        //Log.d("Hamster", "updateAdapter, children = ${currentNode.children.map { it.name }}")
         rvItemList.adapter = adapter
         if (currentNode.parent == null) {
             tvParentNodeName.text = "Root:\n${currentNode.name}"
@@ -138,35 +116,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setDefaultStructure() {
-        //Log.d("Hamster", "setDefaultStructure")
-        structure = Node()
-        currentNode = structure
-    }
-
     private fun processItemClick(position: Int) {
-        //Log.d("Hamster", "clicked $position")
         currentNode = currentNode.children[position]
         updateAdapter()
     }
 
     private fun processAddItem() {
+        operationsCount++
         currentNode.children.add(
             Node(parent = currentNode)
         )
         updateAdapter()
-        convertToJSON()
+        if (operationsCount == OPERATIONS_LIMIT) {
+            operationsCount = 0
+            convertToJSON()
+        }
     }
 
     private fun processItemDelete(position: Int) {
+        operationsCount++
         currentNode.children.removeAt(position)
         updateAdapter()
-        convertToJSON()
+        if (operationsCount == OPERATIONS_LIMIT) {
+            operationsCount = 0
+            convertToJSON()
+        }
     }
 
     private fun processGoToParentNode() {
         val parent = currentNode.parent
-        //Log.d("Hamster", "processGoToParentNode ${parent?.name}")
         if (parent != null) {
             currentNode = parent
         }

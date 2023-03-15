@@ -3,5 +3,5 @@
     <string name="default_string">Default text</string>
     <string name="add_node_caption">Add node</string>
     <string name="save_caption">Save tree</string>
-    <string name="delete_caption">Delete tree</string>
+    <string name="delete_caption">New tree</string>
 </resources>
