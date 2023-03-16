@@ -1,23 +1,13 @@
 package com.example.denettree
 
-import android.util.Log
-import com.google.gson.annotations.SerializedName
 import java.math.BigInteger
 import java.security.MessageDigest
-import java.util.UUID
+import java.util.*
 
 class Node(
-
-    @SerializedName("id")
     val id: String = UUID.randomUUID().toString(),
-
-    @SerializedName("parent")
     var parent: Node? = null,
-
-    @SerializedName("name")
     var name: String = "",
-
-    @SerializedName("children")
     val children: MutableList<Node> = mutableListOf()
 ) {
 

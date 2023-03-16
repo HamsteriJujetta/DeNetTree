@@ -23,22 +23,6 @@ class NodeSerializer : TypeAdapter<Node>() {
         }
     }
 
-    /*private fun customWrite(jsonWriter: JsonWriter, node: Node) {
-        jsonWriter.beginObject()
-            ?.name("id")
-            ?.jsonValue("\"" + node.id + "\"")
-            ?.name("name")
-            ?.jsonValue("\"" + node.name + "\"")
-            ?.name("children")
-            ?.beginArray()
-
-        for (n in node.children) {
-            this.write(jsonWriter, n)
-        }
-        jsonWriter.endArray()
-            .endObject()
-    }*/
-
     override fun read(jsonReader: JsonReader?): Node? {
         return null
     }
